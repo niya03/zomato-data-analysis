@@ -4,6 +4,7 @@ import seaborn as sns
 from collections import Counter
 
 df = pd.read_csv("zomato_cleaned.csv")
+df.info()
 
 #Top 10 most common cuisines
 cuisines_series = df['cuisines'].dropna().apply(lambda x: x.split(', '))
