@@ -12,7 +12,7 @@ df = pd.read_csv("DATASETS/zomato_cleaned.csv")
 # Features for Clustering
 features = [
     'averagecost', 'ishomedelivery', 'istakeaway', 'isvegonly',
-    'isindoorseating', 'area', 'cuisines'
+    'isindoorseating', 'area', 'cuisines', 'dinner ratings'
 ]
 X = df[features].copy(deep=True)
 
@@ -20,12 +20,13 @@ X = df[features].copy(deep=True)
 X['averagecost'] = X['averagecost'].fillna(X['averagecost'].median())
 X['area'] = X['area'].fillna("Unknown")
 X['cuisines'] = X['cuisines'].fillna("Other")
+X['dinner ratings'] = X['dinner ratings'].fillna(X['dinner ratings'].median())
 
 # Use only the first listed cuisine
 X['cuisines'] = X['cuisines'].apply(lambda x: x.split(',')[0].strip())
 
 # Define feature types
-numeric_features = ['averagecost']
+numeric_features = ['averagecost', 'dinner ratings']  
 categorical_features = ['area', 'cuisines']
 binary_features = ['ishomedelivery', 'istakeaway', 'isvegonly', 'isindoorseating']
 
@@ -67,16 +68,18 @@ plt.show()
 print("\nCluster Summary Statistics:")
 cluster_summary = df.groupby('cluster').agg({
     'averagecost': 'mean',
+    'dinner ratings': 'mean',  
     'ishomedelivery': 'mean',
     'istakeaway': 'mean',
     'isvegonly': 'mean',
     'isindoorseating': 'mean'
 })
+
 cluster_summary['restaurant_count'] = df.groupby('cluster').size()
 print(cluster_summary)
 
 # Plot Feature Profiles per Cluster
-features_to_plot = ['averagecost', 'ishomedelivery', 'istakeaway', 'isvegonly', 'isindoorseating']
+features_to_plot = ['averagecost', 'dinner ratings', 'ishomedelivery', 'istakeaway', 'isvegonly', 'isindoorseating']
 cluster_summary[features_to_plot].plot(kind='bar', figsize=(12,10), subplots=True, layout=(2,3), legend=False)
 plt.suptitle('Cluster Feature Profiles', fontsize=16)
 plt.show()
@@ -92,7 +95,7 @@ for i in range(k):
     plt.show()
 
 # Export Clustered Dataset
-columns_to_export = ['name', 'cuisines', 'area', 'averagecost','cluster']
+columns_to_export = ['name', 'cuisines', 'area', 'averagecost','dinner ratings','cluster']
 existing_columns = [col for col in columns_to_export if col in df.columns]
 df_export = df[existing_columns]
 df_export.to_csv('DATASETS/zomato_cluster.csv', index=False)
