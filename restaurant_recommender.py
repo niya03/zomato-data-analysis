@@ -4,117 +4,169 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-# Page configuration
+# page configuration
 st.set_page_config(
     page_title="Bangalore Restaurant Recommender", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for unified styling
+# custom CSS
 st.markdown("""
 <style>
+    :root {
+        /* Professional Blue Color Palette */
+        --primary-blue: #2563eb;
+        --primary-blue-light: #3b82f6;
+        --primary-blue-dark: #1d4ed8;
+        
+        /* Background Colors */
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --bg-tertiary: #f1f5f9;
+        --bg-accent: #eff6ff;
+        
+        /* Text Colors */
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --text-accent: #2563eb;
+        
+        /* Border Colors */
+        --border-light: #e2e8f0;
+        --border-medium: #cbd5e1;
+        --border-accent: #bfdbfe;
+        
+        /* Status Colors */
+        --success: #10b981;
+        --success-light: #d1fae5;
+        --warning: #f59e0b;
+        --warning-light: #fef3c7;
+    }
+    
     .main {
         padding-top: 1rem;
-        background-color: #f8f9fa;
+        background: var(--bg-secondary);
+        min-height: 100vh;
     }
     
     .stApp {
-        background-color: #f8f9fa;
+        background: var(--bg-secondary);
     }
     
-    /* Sidebar styling - Fixed for better visibility */
+    /* Sidebar */
     .stSidebar {
-        background-color: #ffffff !important;
-        border-right: 2px solid #e9ecef;
+        background: var(--bg-primary) !important;
+        border-right: 1px solid var(--border-light);
         padding-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
     .stSidebar .stSidebar-content {
-        background-color: #ffffff !important;
-        padding: 1rem;
+        background: var(--bg-primary) !important;
+        padding: 1.5rem;
     }
     
-    /* Fix sidebar text and components */
+    /* sidebartext */
     .stSidebar h1, .stSidebar h2, .stSidebar h3, .stSidebar h4, .stSidebar h5, .stSidebar h6,
     .stSidebar p, .stSidebar div, .stSidebar span, .stSidebar label {
-        color: #2c3e50 !important;
+        color: var(--text-primary) !important;
+        font-weight: 500;
     }
     
     .stSidebar .stMarkdown {
-        color: #2c3e50 !important;
+        color: var(--text-primary) !important;
     }
     
-    /* Fix radio buttons in sidebar */
+    /* radio buttons */
     .stSidebar .stRadio > div {
-        background-color: #f8f9fa !important;
+        background: var(--bg-primary) !important;
         padding: 1rem !important;
         border-radius: 8px !important;
-        border: 2px solid #dee2e6 !important;
+        border: 1px solid var(--border-light) !important;
+        transition: all 0.2s ease;
+    }
+    
+    .stSidebar .stRadio > div:hover {
+        border-color: var(--border-accent) !important;
+        background: var(--bg-accent) !important;
     }
     
     .stSidebar .stRadio label {
-        color: #2c3e50 !important;
-        font-weight: 600 !important;
+        color: var(--text-primary) !important;
+        font-weight: 500 !important;
     }
     
-    /* Fix selectbox in sidebar */
+    /* selectbox */
     .stSidebar .stSelectbox > div > div {
-        background-color: #ffffff !important;
-        color: #2c3e50 !important;
-        border: 2px solid #dee2e6 !important;
-        border-radius: 8px !important;
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-light) !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease;
+    }
+    
+    .stSidebar .stSelectbox > div > div:hover {
+        border-color: var(--border-accent) !important;
+        background: var(--bg-accent) !important;
     }
     
     .stSidebar .stSelectbox label {
-        color: #2c3e50 !important;
+        color: var(--text-primary) !important;
         font-weight: 600 !important;
     }
     
-    /* Sidebar metrics styling */
+    /*metrics */
     .stSidebar .stMetric {
-        background-color: #f8f9fa !important;
-        padding: 0.75rem !important;
+        background: var(--bg-accent) !important;
+        border: 1px solid var(--border-accent) !important;
+        color: var(--text-accent) !important;
+        padding: 1rem !important;
         border-radius: 8px !important;
-        border: 1px solid #dee2e6 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 1rem !important;
+        transition: all 0.2s ease;
+    }
+    
+    .stSidebar .stMetric:hover {
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        transform: translateY(-1px);
     }
     
     .stSidebar .stMetric label, 
     .stSidebar .stMetric div[data-testid="metric-container"] > div {
-        color: #2c3e50 !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
+        color: var(--text-accent) !important;
     }
     
-    /* Main content styling */
+    /* Restaurant Cards */
     .restaurant-card {
-        background: #ffffff;
+        background: var(--bg-primary);
         border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e9ecef;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border-light);
+        transition: all 0.2s ease;
     }
     
     .restaurant-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border-color: var(--border-accent);
     }
     
     .restaurant-name {
-        color: #2c3e50;
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 10px;
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
         gap: 8px;
     }
     
     .restaurant-details {
-        color: #495057;
-        font-size: 0.95rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
         line-height: 1.5;
         margin-bottom: 6px;
         display: flex;
@@ -126,31 +178,34 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 12px;
-        padding-top: 12px;
-        border-top: 1px solid #f1f3f4;
-        gap: 10px;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-light);
+        gap: 12px;
         flex-wrap: wrap;
     }
     
+    /* rating */
     .rating {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
+        background: var(--success-light);
+        color: #000000;
         padding: 6px 12px;
-        border-radius: 15px;
+        border-radius: 6px;
         font-weight: 600;
         font-size: 0.85rem;
         display: flex;
         align-items: center;
         gap: 4px;
         white-space: nowrap;
+        border: 1px solid #a7f3d0;
     }
     
+    /* cost */
     .cost {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
+        background: var(--primary-blue);
+        color: var(--bg-primary);
         padding: 6px 12px;
-        border-radius: 15px;
+        border-radius: 6px;
         font-weight: 600;
         font-size: 0.85rem;
         display: flex;
@@ -161,99 +216,193 @@ st.markdown("""
     
     .features-row {
         display: flex;
-        gap: 8px;
-        margin-top: 8px;
+        gap: 6px;
+        margin-top: 0.75rem;
         flex-wrap: wrap;
     }
     
+    /* badges */
     .feature-badge {
-        background: #f8f9fa;
-        color: #495057;
-        padding: 4px 8px;
-        border-radius: 12px;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-light);
+        padding: 4px 10px;
+        border-radius: 4px;
         font-size: 0.75rem;
-        border: 1px solid #dee2e6;
+        font-weight: 500;
+        transition: all 0.2s ease;
     }
     
+    .feature-badge:hover {
+        background: var(--bg-accent);
+        color: var(--text-accent);
+        border-color: var(--border-accent);
+    }
+    
+    /* header */
     .header-container {
         text-align: center;
-        padding: 1.5rem 0;
-        margin-bottom: 1.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
         border-radius: 12px;
-        color: white;
+        color: var(--bg-primary);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid #334155;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .header-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+        pointer-events: none;
     }
     
     .main-title {
-        font-size: 2.5rem;
-        font-weight: 800;
+        font-size: 2rem;
+        font-weight: 700;
         margin-bottom: 0.5rem;
-        color: white !important;
+        color: var(--bg-primary) !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
     }
     
     .subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9) !important;
         font-weight: 400;
-        color: white !important;
+        position: relative;
+        z-index: 1;
     }
     
+    /* section headers */
     .section-header {
-        color: #2c3e50 !important;
-        font-size: 1.4rem;
+        color: var(--text-primary) !important;
+        font-size: 1.2rem;
         font-weight: 600;
         margin: 1.5rem 0 1rem 0;
         text-align: center;
-        padding: 0.8rem;
-        background: #ffffff;
+        padding: 1rem;
+        background: var(--bg-accent);
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-accent);
     }
     
     .no-results {
         text-align: center;
-        color: #6c757d;
-        font-size: 1.1rem;
+        color: var(--text-secondary);
+        font-size: 1rem;
         padding: 2rem;
-        background: #ffffff;
+        background: var(--bg-primary);
         border-radius: 12px;
-        margin: 2rem 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin: 1.5rem 0;
+        border: 1px solid var(--border-light);
     }
     
+    /* sidebar sections */
     .sidebar-section {
-        background: #f8f9fa;
+        background: var(--bg-accent);
         padding: 1rem;
-        border-radius: 10px;
+        border-radius: 8px;
         margin-bottom: 1rem;
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--border-accent);
     }
     
     .sidebar-title {
-        color: #2c3e50 !important;
-        font-size: 1.1rem !important;
+        color: var(--text-accent) !important;
+        font-size: 1rem !important;
         font-weight: 600 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
     }
     
-    /* Info boxes */
+    /* info */
     .stInfo {
-        background-color: #e3f2fd !important;
-        border: 1px solid #90caf9 !important;
+        background: var(--bg-accent) !important;
+        border: 1px solid var(--border-accent) !important;
         border-radius: 8px !important;
     }
     
     .stInfo > div {
-        color: #1565c0 !important;
+        color: var(--text-accent) !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Dropdown  */
+    .stSelectbox > div,
+    div[data-baseweb="select"] > div {
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-light) !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease;
+    }
+    
+    .stSelectbox > div:hover,
+    div[data-baseweb="select"] > div:hover {
+        border-color: var(--border-accent) !important;
+        background: var(--bg-accent) !important;
+    }
+    
+    div[data-baseweb="select"] div[role="option"] {
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+        padding: 10px 12px;
+    }
+    
+    div[data-baseweb="select"] div[role="option"]:hover {
+        background: var(--bg-accent) !important;
+    }
+    
+    /* focus */
+    div[data-baseweb="select"]:focus-within,
+    div[data-baseweb="input"]:focus-within,
+    .stSelectbox > div:focus-within,
+    .stTextInput > div:focus-within {
+        border-color: var(--primary-blue) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue) !important;
+    }
+    
+    button:focus,
+    input:focus,
+    select:focus {
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+    
+    /* typograohy */
+    * {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+    
+    /*Transitions */
+    .restaurant-card,
+    .rating,
+    .cost,
+    .feature-badge,
+    .sidebar-section {
+        transition: all 0.2s ease;
     }
 </style>
 """, unsafe_allow_html=True)
 
 @st.cache_data
 def load_data():
-    """Load and preprocess the data"""
     try:
-        # Try to load the CSV file
+        #load the CSV file
         df = pd.read_csv("zomato_cleaned.csv")
         
         # Data cleaning and preprocessing
@@ -261,7 +410,7 @@ def load_data():
         df['name'] = df['name'].fillna('Unknown Restaurant')
         df['full_address'] = df['full_address'].fillna('Address not available')
         
-        # Handle ratings - use 'dinner ratings' as primary rating column
+        # Handle ratings
         if 'dinner ratings' in df.columns:
             df['rating'] = pd.to_numeric(df['dinner ratings'], errors='coerce').fillna(0)
         else:
@@ -273,11 +422,10 @@ def load_data():
                     df['rating'] = pd.to_numeric(df[col], errors='coerce').fillna(0)
                     break
         
-        # Handle cost - use 'averagecost' column directly since it exists in your data
+        # Handle cost 
         if 'averagecost' in df.columns:
             df['cost'] = pd.to_numeric(df['averagecost'], errors='coerce').fillna(0)
         else:
-            # Fallback for other possible cost columns
             cost_columns = ['average_cost_for_two', 'cost', 'approx_cost(for two people)']
             df['cost'] = 0
             for col in cost_columns:
@@ -288,7 +436,7 @@ def load_data():
                         df['cost'] = pd.to_numeric(df[col], errors='coerce').fillna(0)
                     break
         
-        # Add service features (convert boolean columns to more readable names)
+        # Add service features 
         if 'ishomedelivery' in df.columns:
             df['home_delivery'] = df['ishomedelivery'].fillna(False)
         else:
@@ -313,7 +461,6 @@ def load_data():
         df = df.drop_duplicates(subset=['name'], keep='first')
         df = df[df['name'] != 'Unknown Restaurant']
         
-        # IMPORTANT: Reset index to ensure continuity and avoid index mismatches
         df = df.reset_index(drop=True)
         
         return df
@@ -356,24 +503,24 @@ def compute_similarity(df):
 def recommend_by_restaurant(df, cosine_sim, name, num_recommendations=6):
     """Recommend restaurants similar to a given restaurant"""
     try:
-        # Find the restaurant index
+        # restaurant index
         matches = df[df['name'].str.contains(name, case=False, na=False)]
         if matches.empty:
             return pd.DataFrame()
         
-        # Get the first match index
+        # irst match index
         idx = matches.index[0]
         
-        # Safety check: ensure index is within bounds
+        # ensure index is within bounds
         if idx >= len(df) or idx >= cosine_sim.shape[0]:
             st.error(f"Index error: Restaurant index {idx} is out of bounds.")
             return pd.DataFrame()
         
-        # Get similarity scores
+        # similarity scores
         sim_scores = list(enumerate(cosine_sim[idx]))
         sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
         
-        # Get top similar restaurants (excluding the selected one)
+        #  top similar restaurants 
         restaurant_indices = []
         for i, score in sim_scores[1:num_recommendations+1]:
             if i < len(df):  # Safety check
@@ -563,6 +710,7 @@ def main():
             
             if not results.empty:
                 st.markdown(f'<h3 class="section-header">Restaurants similar to "{selected_restaurant}"</h3>', unsafe_allow_html=True)
+                st.markdown("<div style='margin-bottom: 24px;'></div>", unsafe_allow_html=True)
                 
                 # Display results in columns for better layout
                 for i in range(len(results)):
