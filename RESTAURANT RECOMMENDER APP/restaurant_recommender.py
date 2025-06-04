@@ -403,7 +403,7 @@ st.markdown("""
 def load_data():
     try:
         #load the CSV file
-        df = pd.read_csv("zomato_cleaned.csv")
+        df = pd.read_csv("DATASETS/zomato_cleaned.csv")
         
         # Data cleaning and preprocessing
         df['cuisines'] = df['cuisines'].fillna('Unknown')

@@ -4,7 +4,7 @@ import ast
 import re
 
 # read dataset
-df = pd.read_csv("BangaloreZomatoData.csv", encoding='latin-1')
+df = pd.read_csv("DATASETS/BangaloreZomatoData.csv", encoding='latin-1')
 print(df.columns)
 
 # make columns lowercase
@@ -75,4 +75,4 @@ for col in cat_cols:
     df[col] = df[col].astype('category')
 
 # save cleaned dataset
-df.to_csv("zomato_cleaned.csv", index=False)
+# df.to_csv("zomato_cleaned.csv", index=False)
