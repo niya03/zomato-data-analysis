@@ -725,7 +725,7 @@ def main():
     elif option == "By Cuisine Type":
         st.markdown('<h2 class="section-header">Explore by Cuisine</h2>', unsafe_allow_html=True)
         
-        # Get unique cuisines
+        # unique cuisines
         all_cuisines = []
         for cuisines in df['cuisines'].dropna():
             if cuisines and cuisines != 'Unknown':
@@ -750,7 +750,7 @@ def main():
             if not results.empty:
                 st.markdown(f'<h3 class="section-header">Top {cuisine_input} Restaurants</h3>', unsafe_allow_html=True)
                 
-                # Display results in columns for better layout
+                # Display results 
                 for i in range(len(results)):
                     if i % 2 == 0:
                         cols = st.columns(2)

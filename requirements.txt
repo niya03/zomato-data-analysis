@@ -5,3 +5,4 @@ seaborn
 textblob
 streamlit
 scikit-learn
+plotly
