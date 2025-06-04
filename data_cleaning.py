@@ -4,7 +4,7 @@ import ast
 import re
 
 # read dataset
-df = pd.read_csv("DATASETS/BangaloreZomatoData.csv", encoding='latin-1')
+df = pd.read_csv("../DATASETS/BangaloreZomatoData.csv", encoding='latin-1')
 print(df.columns)
 
 # make columns lowercase

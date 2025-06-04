@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
 
-df = pd.read_csv("DATASETS/zomato_cleaned.csv")
+df = pd.read_csv("../DATASETS/zomato_cleaned.csv")
 df.info()
 
 #Top 10 most common cuisines

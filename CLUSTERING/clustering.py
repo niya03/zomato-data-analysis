@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-df = pd.read_csv("DATASETS/zomato_cleaned.csv")
+df = pd.read_csv("../DATASETS/zomato_cleaned.csv")
 
 #Features for Clustering
 features = [
